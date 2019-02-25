@@ -1,0 +1,3 @@
+[submodule "ImageDSPUtils"]
+	path = ImageDSPUtils
+	url = https://github.com/SMU-MSLC-2016/ImageDSPUtils.git
