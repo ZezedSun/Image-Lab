@@ -11,6 +11,6 @@
 @interface OpenCVBridgeSub : OpenCVBridge
 
 @property (nonatomic)BOOL finger;
-@property (nonatomic)double rawData;
-
+@property (nonatomic)double curRed;
+@property (nonatomic)double curheartRate;
 @end

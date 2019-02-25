@@ -6,6 +6,10 @@
 //  Copyright © 2016 Eric Larson. All rights reserved.
 //
 
+
+//**************************************************
+//Module A
+//**************************************************
 import UIKit
 import AVFoundation
 
@@ -18,14 +22,8 @@ class ViewController: UIViewController   {
 
     @IBOutlet weak var faceStatus: UILabel!
     
-    @IBOutlet weak var HRValue: UITextField!
-    
-    @IBOutlet weak var BRValue: UITextField!
     let pinchFilterIndex = 2
     let bridge = OpenCVBridge()
-
-    //MARK: Outlets in view
-    @IBOutlet weak var flashSlider: UISlider!
 
 
     //MARK: ViewController Hierarchy
@@ -46,44 +44,32 @@ class ViewController: UIViewController   {
         self.detector = CIDetector(ofType: CIDetectorTypeFace,
                                   context: self.videoManager.getCIContext(), // perform on the GPU is possible
                                   options: optsDetector)
-
-
-       // self.videoManager.setProcessingBlock(newProcessBlock: self.processImage)
-
-        //***********//
-        //create face detection block
-        ///self.videoManager.setProcessingBlock(newProcessBlock: <#T##ProcessBlock##ProcessBlock##(CIImage) -> (CIImage)#>)
-        //***********************
         self.videoManager.setProcessingBlock(newProcessBlock: self.processImage)
         
         if !videoManager.isRunning{
             videoManager.start()
         }
 
-        //self.bridge.processType = 1
-
     }
-
-   
 
     //MARK: Setup filtering
     func setupFilters(){
         filters = []
 
-        let filterPinch = CIFilter(name:"CIBumpDistortion")!
-        filterPinch.setValue(-0.3, forKey: "inputScale")
-        filterPinch.setValue(75, forKey: "inputRadius")
-        filters.append(filterPinch)
+//        let filterPinch = CIFilter(name:"CIBumpDistortion")!
+//        filterPinch.setValue(-0.3, forKey: "inputScale")
+//        filterPinch.setValue(75, forKey: "inputRadius")
+//        filters.append(filterPinch)
         
         let filterHole = CIFilter(name:"CIHoleDistortion")!
-        filterHole.setValue(50, forKey: "inputRadius")
+        filterHole.setValue(30, forKey: "inputRadius")
         filters.append(filterHole)
 
-//        let filterPinch = CIFilter(name:"CITorusLensDistortion")!
-//        filterPinch.setValue(50, forKey: "inputWidth")
-//        filterPinch.setValue(80, forKey: "inputRadius")
-//        filterPinch.setValue(0.8, forKey: "inputRefraction")
-//        filters.append(filterPinch)
+        let filterPinch = CIFilter(name:"CITorusLensDistortion")!
+        filterPinch.setValue(50, forKey: "inputWidth")
+        filterPinch.setValue(80, forKey: "inputRadius")
+        filterPinch.setValue(0.9, forKey: "inputRefraction")
+        filters.append(filterPinch)
 
 
     }
@@ -113,15 +99,16 @@ class ViewController: UIViewController   {
         var filterCenter2 = CGPoint()
         var filterCenter3 = CGPoint()
 
-
+     
         for f in features {
+        // display if the user is smiling or blinking (and with which eye)
             DispatchQueue.main.async{
                 if(f.leftEyeClosed){
-                    self.faceStatus.text = "Left eye closed"
-                    NSLog("Left eye closed")
+                    self.faceStatus.text = "Left eye close"
+                    NSLog("Left eye close")
                 }
                 else if(f.rightEyeClosed){
-                    self.faceStatus.text = "Right eye closed"
+                    self.faceStatus.text = "Right eye close"
                      NSLog("Right eye closed")
                 }
                 else if(f.hasSmile){
@@ -135,7 +122,7 @@ class ViewController: UIViewController   {
             }
 
 
-            //set where to apply filter
+            //where to apply filter
             filterCenter1.x = f.leftEyePosition.x
             filterCenter1.y = f.leftEyePosition.y
             filterCenter2.x = f.rightEyePosition.x
@@ -193,31 +180,6 @@ class ViewController: UIViewController   {
 
             // return retImage
         }
-
-
-
-    //MARK: Convenience Methods for UI Flash and Camera Toggle
-//    @IBAction func flash(sender: AnyObject) {
-//        if(self.videoManager.toggleFlash()){
-//            self.flashSlider.value = 1.0
-//        }
-//        else{
-//            self.flashSlider.value = 0.0
-//        }
-//    }
-//
-//    @IBAction func switchCamera(sender: AnyObject) {
-//        self.videoManager.toggleCameraPosition()
-//    }
-//
-//    @IBAction func setFlashLevel(sender: UISlider) {
-//        if(sender.value>0.0){
-//            self.videoManager.turnOnFlashwithLevel(sender.value)
-//        }
-//        else if(sender.value==0.0){
-//            self.videoManager.turnOffFlash()
-//        }
-//    }
 
 }
 
